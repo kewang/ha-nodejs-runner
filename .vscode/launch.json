@@ -1,0 +1,16 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch power_outage",
+      "runtimeExecutable": "/home/kewang/.nvm/versions/node/v20.18.1/bin/node",
+      "program": "${workspaceFolder}/scripts/power_outage.js",
+      "console": "integratedTerminal"
+    }
+  ]
+}

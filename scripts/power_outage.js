@@ -1,31 +1,38 @@
 const cheerio = require("cheerio");
 const axios = require("axios").default;
 const moment = require("moment");
+const fs = require("fs").promises;
 
 const URL =
   "https://service.taipower.com.tw/branch/d101/xcnotice?xsmsid=0M242581316312033070";
 
-const OUTAGE_KEYWORD = "和豐街";
+const OUTAGE_KEYWORD = "秀峰路";
 const TW_YEAR_OFFSET = 1911;
+
+const STATUS = {
+  STATUS_NO_OUTAGE: 1,
+  STATUS_OUTAGE: 2,
+  STATUS_ERROR: 3,
+};
 
 (async () => {
   try {
     const htmlBody = await axios.get(URL);
 
-    const $ = cheerio.load(htmlBody);
-
-    const tables = $(".ListTable");
+    const $ = cheerio.load(htmlBody.data);
 
     let foundDate;
 
-    for (const table of tables) {
-      const found = table.includes(OUTAGE_KEYWORD);
+    $(".ListTable").each((index, table) => {
+      const text = $(table).text();
+
+      const found = text.includes(OUTAGE_KEYWORD);
 
       if (!found) {
-        continue;
+        return;
       }
 
-      const outageDateRaw = found.find("caption").innerText; // 工作停電日期 ( 非限電 )：114 年 11 月 07 日
+      const outageDateRaw = $(table).find("caption").text(); // 工作停電日期 ( 非限電 )：114 年 11 月 07 日
 
       const outageDateParts = outageDateRaw
         .split("：")[1]
@@ -44,16 +51,42 @@ const TW_YEAR_OFFSET = 1911;
       if (outageDate.isAfter(moment())) {
         foundDate = outageDate;
 
-        break;
+        return false; // break loop
       }
-    }
+    });
 
     if (foundDate) {
+      await fs.writeFile(
+        "/share/power_outage.txt",
+        JSON.stringify({
+          status: STATUS.STATUS_OUTAGE,
+          updatedAt: moment().format(),
+          date: foundDate.format("YYYY/MM/DD"),
+        })
+      );
+
       console.log(foundDate.format("YYYY/MM/DD"));
     } else {
+      await fs.writeFile(
+        "/share/power_outage.txt",
+        JSON.stringify({
+          status: STATUS.STATUS_NO_OUTAGE,
+          updatedAt: moment().format(),
+        })
+      );
+
       console.log("最近沒有停電");
     }
   } catch (error) {
-    console.error("無法取得停電資訊");
+    await fs.writeFile(
+      "/share/power_outage.txt",
+      JSON.stringify({
+        status: STATUS.STATUS_ERROR,
+        updatedAt: moment().format(),
+      })
+    );
+
+    console.error(error);
+    console.error("發生錯誤");
   }
 })();
