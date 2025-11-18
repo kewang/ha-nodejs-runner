@@ -8,6 +8,8 @@ options:
   script: hello.js
 schema:
   script: str
+map:
+  - config
 arch:
   - aarch64
   - amd64
