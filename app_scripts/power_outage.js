@@ -50,7 +50,7 @@ const OUTPUT_FILE = "/config/node_scheduler_outputs/power_outage.json";
         "YYYY/MM/DD"
       );
 
-      if (outageDate.isAfter(moment())) {
+      if (outageDate.isSameOrAfter(moment(), "day")) {
         foundDate = outageDate;
 
         return false; // break loop
