@@ -1,13 +1,25 @@
-name: Node.js Runner
+name: "Node.js Script Scheduler"
 version: "1.0.0"
-slug: nodejs_runner
-description: Run various Node.js scripts inside one Add-on
-startup: application
-boot: auto
-options:
-  script: hello.js
-schema:
-  script: str
+slug: "node_scheduler"
+description: "Run custom Node.js scripts on a schedule with ENV support."
 arch:
   - aarch64
   - amd64
+  - armv7
+startup: application
+map:
+  - config:rw  # 重要：允許讀寫 /config 資料夾，以便與 HA 共用檔案
+options:
+  scripts: []
+schema:
+  scripts:
+    - name: path
+      str: true
+      description: "Script path inside /config (e.g., node_scripts/myscript.js)"
+    - name: cron
+      str: true
+      description: "Cron expression (e.g., '*/5 * * * *' for every 5 mins)"
+    - name: env_vars
+      str: true
+      optional: true
+      description: "Environment variables in JSON format (e.g., {'MY_KEY': '123'})"
