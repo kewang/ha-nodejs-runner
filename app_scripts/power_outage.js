@@ -15,6 +15,8 @@ const STATUS = {
   STATUS_ERROR: 3,
 };
 
+const OUTPUT_FILE = "/config/node_scheduler_outputs/power_outage.json";
+
 (async () => {
   try {
     const htmlBody = await axios.get(URL);
@@ -57,7 +59,7 @@ const STATUS = {
 
     if (foundDate) {
       await fs.writeFile(
-        "/config/node_scripts/power_outage.json",
+        OUTPUT_FILE,
         JSON.stringify({
           status: STATUS.STATUS_OUTAGE,
           updatedAt: moment().format(),
@@ -68,7 +70,7 @@ const STATUS = {
       console.log(foundDate.format("YYYY/MM/DD"));
     } else {
       await fs.writeFile(
-        "/config/node_scripts/power_outage.json",
+        OUTPUT_FILE,
         JSON.stringify({
           status: STATUS.STATUS_NO_OUTAGE,
           updatedAt: moment().format(),
@@ -79,7 +81,7 @@ const STATUS = {
     }
   } catch (error) {
     await fs.writeFile(
-      "/config/node_scripts/power_outage.json",
+      OUTPUT_FILE,
       JSON.stringify({
         status: STATUS.STATUS_ERROR,
         updatedAt: moment().format(),
