@@ -57,7 +57,7 @@ const STATUS = {
 
     if (foundDate) {
       await fs.writeFile(
-        "/share/power_outage.txt",
+        "/config/node_scripts/power_outage.json",
         JSON.stringify({
           status: STATUS.STATUS_OUTAGE,
           updatedAt: moment().format(),
@@ -68,7 +68,7 @@ const STATUS = {
       console.log(foundDate.format("YYYY/MM/DD"));
     } else {
       await fs.writeFile(
-        "/share/power_outage.txt",
+        "/config/node_scripts/power_outage.json",
         JSON.stringify({
           status: STATUS.STATUS_NO_OUTAGE,
           updatedAt: moment().format(),
@@ -79,7 +79,7 @@ const STATUS = {
     }
   } catch (error) {
     await fs.writeFile(
-      "/share/power_outage.txt",
+      "/config/node_scripts/power_outage.json",
       JSON.stringify({
         status: STATUS.STATUS_ERROR,
         updatedAt: moment().format(),

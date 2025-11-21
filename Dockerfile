@@ -14,5 +14,8 @@ RUN npm install
 # 複製主程式
 COPY runner.js /app/
 
+# 新增：複製內建腳本資料夾到容器內
+COPY app_scripts /app/app_scripts/
+
 # 直接啟動 Node (跳過 S6 init 系統)
 CMD [ "node", "runner.js" ]
