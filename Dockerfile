@@ -1,7 +1,7 @@
 ARG BUILD_FROM
 FROM $BUILD_FROM
 
-# 安裝 Node.js (HA base images 通常基於 Alpine)
+# 安裝 Node.js
 RUN apk add --no-cache nodejs npm
 
 # 設定工作目錄
@@ -14,8 +14,12 @@ RUN npm install
 # 複製主程式
 COPY runner.js /app/
 
-# 讓 runner.js 變成可執行
-RUN chmod a+x /app/runner.js
+# --- 關鍵修改開始 ---
+# 複製啟動腳本到 S6 的服務目錄
+COPY run /etc/services.d/scheduler/run
 
-# 啟動指令
-CMD [ "node", "/app/runner.js" ]
+# 給予執行權限
+RUN chmod a+x /etc/services.d/scheduler/run
+# --- 關鍵修改結束 ---
+
+# 注意：這裡不需要 CMD，因為 Base Image 的 Entrypoint 會自動掃描 /etc/services.d
