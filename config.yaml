@@ -1,5 +1,5 @@
 name: "Node.js Script Scheduler"
-version: "1.0.0"
+version: "1.0.1"
 slug: "node_scheduler"
 description: "Run custom Node.js scripts on a schedule with ENV support."
 arch:
@@ -8,18 +8,8 @@ arch:
   - armv7
 startup: application
 map:
-  - config:rw  # 重要：允許讀寫 /config 資料夾，以便與 HA 共用檔案
+  - config:rw
 options:
   scripts: []
-schema:
-  scripts:
-    - name: path
-      str: true
-      description: "Script path inside /config (e.g., node_scripts/myscript.js)"
-    - name: cron
-      str: true
-      description: "Cron expression (e.g., '*/5 * * * *' for every 5 mins)"
-    - name: env_vars
-      str: true
-      optional: true
-      description: "Environment variables in JSON format (e.g., {'MY_KEY': '123'})"
+# 將 schema 設為 false，讓 HA 直接提供 YAML 編輯器，避免格式驗證錯誤
+schema: false
