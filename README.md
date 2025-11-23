@@ -1,6 +1,6 @@
 # Home Assistant Node.js Script Scheduler
 
-這是一個 Home Assistant Add-on,用於定期執行自訂的 Node.js 腳本。支援 cron 排程、環境變數設定,以及透過 MQTT 與 Home Assistant 整合。
+這是一個 Home Assistant Add-on，用於定期執行自訂的 Node.js 腳本。支援 cron 排程、環境變數設定，以及透過 MQTT 與 Home Assistant 整合。
 
 ## 功能特色
 
@@ -20,7 +20,7 @@
 
 ## 設定範例
 
-在 Add-on 設定頁面中,按照以下格式設定您的腳本:
+在 Add-on 設定頁面中，按照以下格式設定您的腳本：
 
 ```yaml
 scripts:
@@ -38,7 +38,7 @@ scripts:
 - `cron`: Cron 排程表達式
   - 格式: `秒 分 時 日 月 星期`
   - 範例: `0 8 * * *` 表示每天早上 8:00 執行
-- `env_vars`: (選填) 環境變數,可以是 JSON 字串或物件格式
+- `env_vars`: (選填) 環境變數，可以是 JSON 字串或物件格式
 
 ### Cron 語法參考
 
@@ -62,31 +62,31 @@ scripts:
 
 ### 1. 停電通知 (`power_outage.js`)
 
-監控台電網站的停電公告,當指定區域有停電通知時,自動在 Home Assistant 建立 sensor。
+監控台電網站的停電公告，當指定區域有停電通知時，自動在 Home Assistant 建立 sensor。
 
 **環境變數:**
-- `OUTAGE_KEYWORD`: 要監控的街道名稱 (預設: "和豐街")
-- `MQTT_HOST`: MQTT broker 位址 (預設: "mqtt://core-mosquitto")
-- `MQTT_USER`: MQTT 使用者名稱
-- `MQTT_PASS`: MQTT 密碼
+- `OUTAGE_KEYWORD`：要監控的街道名稱 (預設："和豐街")
+- `MQTT_HOST`：MQTT broker 位址 (預設："mqtt://core-mosquitto")
+- `MQTT_USER`：MQTT 使用者名稱
+- `MQTT_PASS`：MQTT 密碼
 
 **輸出到 HA:**
-- Entity: `sensor.node_scheduler_power_outage`
-- 狀態: `1` (無停電) / `2` (有停電) / `3` (錯誤)
-- 屬性: 停電日期、更新時間等
+- Entity：`sensor.node_scheduler_power_outage`
+- 狀態：`1` (無停電) / `2` (有停電) / `3` (錯誤)
+- 屬性：停電日期、更新時間等
 
 ### 2. 停水通知 (`water_outage.js`)
 
-監控台灣自來水公司的停水公告,當指定區域有停水或降壓通知時,寫入資料到檔案。
+監控台灣自來水公司的停水公告，當指定區域有停水或降壓通知時，寫入資料到檔案。
 
 **環境變數:**
-- `OUTAGE_CITY`: 要監控的縣市 (預設: "基隆市")
-- `OUTAGE_DISTRICT`: 要監控的行政區 (預設: "中正區")
-- `OUTAGE_AREA`: 要監控的區域 (預設: "和豐街")
+- `OUTAGE_CITY`：要監控的縣市 (預設："基隆市")
+- `OUTAGE_DISTRICT`：要監控的行政區 (預設："中正區")
+- `OUTAGE_AREA`：要監控的區域 (預設："和豐街")
 
 **輸出位置:**
-- 檔案: `/config/node_scheduler_outputs/water_outage.json`
-- 格式: JSON,包含狀態、原因、日期等資訊
+- 檔案：`/config/node_scheduler_outputs/water_outage.json`
+- 格式：JSON，包含狀態、原因、日期等資訊
 
 ## 開發自己的腳本
 
@@ -113,7 +113,7 @@ const BASENAME = path.basename(__filename, ".js");
 
 ### 使用 MQTT 整合 Home Assistant
 
-使用內建的 `mqtt_utils.js` 工具:
+使用內建的 `mqtt_utils.js` 工具：
 
 ```javascript
 const { sendToHA } = require("./mqtt_utils");
@@ -136,13 +136,13 @@ await sendToHA(
 
 ### 環境變數使用
 
-在腳本中讀取環境變數:
+在腳本中讀取環境變數：
 
 ```javascript
 const MY_CONFIG = process.env.MY_CONFIG || "預設值";
 ```
 
-在設定檔中傳入:
+在設定檔中傳入：
 
 ```yaml
 scripts:
@@ -153,7 +153,7 @@ scripts:
 
 ### 新增依賴套件
 
-編輯 `/app_scripts/package.json`,在 `dependencies` 中加入需要的套件:
+編輯 `/app_scripts/package.json`，在 `dependencies` 中加入需要的套件：
 
 ```json
 {
@@ -183,21 +183,22 @@ scripts:
 
 ## 技術細節
 
-- **Node.js 版本**: 20 (Alpine)
-- **排程套件**: node-cron
-- **MQTT 客戶端**: mqtt v5
-- **網頁爬蟲**: axios + cheerio
-- **日期處理**: moment
+- **Node.js 版本**：20 (Alpine)
+- **排程套件**：node-cron
+- **MQTT 客戶端**：mqtt v5
+- **網頁爬蟲**：axios + cheerio
+- **日期處理**：moment
 
 ## 除錯
 
-查看 Add-on 日誌可以看到:
+查看 Add-on 日誌可以看到：
+
 - 腳本排程載入狀態
 - 各腳本執行時間
 - 腳本輸出 (stdout/stderr)
 - 執行結束狀態碼
 
-日誌格式範例:
+日誌格式範例：
 ```
 [power_outage.js] Scheduled: 0 8 * * *
 [power_outage.js] Executing...
@@ -206,8 +207,8 @@ scripts:
 
 ## 注意事項
 
-1. Cron 語法必須正確,否則該腳本會被跳過
-2. 腳本路徑必須存在,否則會顯示警告
+1. Cron 語法必須正確，否則該腳本會被跳過
+2. 腳本路徑必須存在，否則會顯示警告
 3. MQTT 設定需與 Home Assistant 的 Mosquitto Add-on 設定一致
 4. 環境變數可以使用 JSON 字串或 YAML 物件格式
 5. 腳本執行時工作目錄會設定為腳本所在資料夾
@@ -222,6 +223,6 @@ kewang
 
 ## 版本歷史
 
-- **1.0.2**: 當前版本
-- **1.0.1**: 新增環境變數支援
-- **1.0.0**: 初始版本
+- **1.0.2**：當前版本
+- **1.0.1**：新增環境變數支援
+- **1.0.0**：初始版本
