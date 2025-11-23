@@ -3,6 +3,7 @@ const axios = require("axios").default;
 const moment = require("moment");
 const fs = require("fs").promises;
 const path = require("path");
+const { sendToHA } = require("./mqtt_utils");
 
 const URL =
   "https://service.taipower.com.tw/branch/d101/xcnotice?xsmsid=0M242581316312033070";
@@ -21,13 +22,19 @@ const OUTPUT_PATH = "/config/node_scheduler_outputs";
 const OUTPUT_FILE = `${OUTPUT_PATH}/${BASENAME}.json`;
 
 (async () => {
-  const fileWrite = async (data) => {
+  const fileWriteAndSendMqtt = async (data) => {
     try {
       await fs.writeFile(OUTPUT_FILE, JSON.stringify(data));
     } catch (error) {
       console.error("寫入檔案失敗，直接顯示原資料", error);
 
       console.log(`data: ${JSON.stringify(data)}`);
+    }
+
+    try {
+      await sendToHA(BASENAME, "停電通知", data);
+    } catch (error) {
+      console.error("MQTT 發送失敗", error);
     }
   };
 
@@ -71,7 +78,7 @@ const OUTPUT_FILE = `${OUTPUT_PATH}/${BASENAME}.json`;
     });
 
     if (foundDate) {
-      await fileWrite({
+      await fileWriteAndSendMqtt({
         status: STATUS.STATUS_OUTAGE,
         updatedAt: moment().format(),
         date: foundDate.format("YYYY/MM/DD"),
@@ -79,7 +86,7 @@ const OUTPUT_FILE = `${OUTPUT_PATH}/${BASENAME}.json`;
 
       console.log(foundDate.format("YYYY/MM/DD"));
     } else {
-      await fileWrite({
+      await fileWriteAndSendMqtt({
         status: STATUS.STATUS_NO_OUTAGE,
         updatedAt: moment().format(),
       });
@@ -87,7 +94,7 @@ const OUTPUT_FILE = `${OUTPUT_PATH}/${BASENAME}.json`;
       console.log("最近沒有停電");
     }
   } catch (error) {
-    await fileWrite({
+    await fileWriteAndSendMqtt({
       status: STATUS.STATUS_ERROR,
       updatedAt: moment().format(),
     });
