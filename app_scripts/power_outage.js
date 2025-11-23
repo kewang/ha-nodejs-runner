@@ -2,6 +2,7 @@ const cheerio = require("cheerio");
 const axios = require("axios").default;
 const moment = require("moment");
 const fs = require("fs").promises;
+const path = require("path");
 
 const URL =
   "https://service.taipower.com.tw/branch/d101/xcnotice?xsmsid=0M242581316312033070";
@@ -15,9 +16,21 @@ const STATUS = {
   STATUS_ERROR: 3,
 };
 
-const OUTPUT_FILE = "/config/node_scheduler_outputs/power_outage.json";
+const BASENAME = path.basename(__filename, ".js");
+const OUTPUT_PATH = "/config/node_scheduler_outputs";
+const OUTPUT_FILE = `${OUTPUT_PATH}/${BASENAME}.json`;
 
 (async () => {
+  const fileWrite = async (data) => {
+    try {
+      await fs.writeFile(OUTPUT_FILE, JSON.stringify(data));
+    } catch (error) {
+      console.error("寫入檔案失敗，直接顯示原資料", error);
+
+      console.log(`data: ${JSON.stringify(data)}`);
+    }
+  };
+
   try {
     const htmlBody = await axios.get(URL);
 
@@ -58,35 +71,26 @@ const OUTPUT_FILE = "/config/node_scheduler_outputs/power_outage.json";
     });
 
     if (foundDate) {
-      await fs.writeFile(
-        OUTPUT_FILE,
-        JSON.stringify({
-          status: STATUS.STATUS_OUTAGE,
-          updatedAt: moment().format(),
-          date: foundDate.format("YYYY/MM/DD"),
-        })
-      );
+      await fileWrite({
+        status: STATUS.STATUS_OUTAGE,
+        updatedAt: moment().format(),
+        date: foundDate.format("YYYY/MM/DD"),
+      });
 
       console.log(foundDate.format("YYYY/MM/DD"));
     } else {
-      await fs.writeFile(
-        OUTPUT_FILE,
-        JSON.stringify({
-          status: STATUS.STATUS_NO_OUTAGE,
-          updatedAt: moment().format(),
-        })
-      );
+      await fileWrite({
+        status: STATUS.STATUS_NO_OUTAGE,
+        updatedAt: moment().format(),
+      });
 
       console.log("最近沒有停電");
     }
   } catch (error) {
-    await fs.writeFile(
-      OUTPUT_FILE,
-      JSON.stringify({
-        status: STATUS.STATUS_ERROR,
-        updatedAt: moment().format(),
-      })
-    );
+    await fileWrite({
+      status: STATUS.STATUS_ERROR,
+      updatedAt: moment().format(),
+    });
 
     console.error(error);
     console.error("發生錯誤");
