@@ -1,7 +1,7 @@
 const axios = require("axios").default;
 const moment = require("moment");
-const fs = require("fs").promises;
 const path = require("path");
+const { sendToHA } = require("./mqtt_utils");
 
 const URL = "https://web.water.gov.tw/wateroffapi/openData/export/json";
 
@@ -9,27 +9,21 @@ const OUTAGE_CITY = process.env.OUTAGE_CITY || "基隆市";
 const OUTAGE_DISTRICT = process.env.OUTAGE_DISTRICT || "中正區";
 const OUTAGE_AREA = process.env.OUTAGE_AREA || "和豐街";
 
-const STATUS = {
+const STATUS_CODE = {
   STATUS_NO_OUTAGE: 1,
   STATUS_OUTAGE: 2,
   STATUS_ERROR: 3,
 };
 
+const STATUS = {
+  STATUS_NO_OUTAGE: "最近沒有停水",
+  STATUS_OUTAGE: "有停水通知",
+  STATUS_ERROR: "發生錯誤",
+};
+
 const BASENAME = path.basename(__filename, ".js");
-const OUTPUT_PATH = "/config/node_scheduler_outputs";
-const OUTPUT_FILE = `${OUTPUT_PATH}/${BASENAME}.json`;
 
 (async () => {
-  const fileWrite = async (data) => {
-    try {
-      await fs.writeFile(OUTPUT_FILE, JSON.stringify(data));
-    } catch (error) {
-      console.error("寫入檔案失敗，直接顯示原資料", error);
-
-      console.log(`data: ${JSON.stringify(data)}`);
-    }
-  };
-
   try {
     const jsonData = (await axios.get(URL)).data;
 
@@ -56,8 +50,9 @@ const OUTPUT_FILE = `${OUTPUT_PATH}/${BASENAME}.json`;
 
       foundDate = moment(foundRecord.案件日期時間, "YYYY-MM-DD HH:mm:ss");
 
-      await fileWrite({
+      await sendToHA(BASENAME, "停水通知", "statusCode", {
         status: STATUS.STATUS_OUTAGE,
+        statusCode: STATUS_CODE.STATUS_OUTAGE,
         reason: [停水原因, 降壓原因].filter(Boolean).join("；"),
         url: caseUrl,
         updatedAt: moment().format(),
@@ -66,16 +61,18 @@ const OUTPUT_FILE = `${OUTPUT_PATH}/${BASENAME}.json`;
 
       console.log(foundDate.format("YYYY/MM/DD"));
     } else {
-      await fileWrite({
+      await sendToHA(BASENAME, "停水通知", "statusCode", {
         status: STATUS.STATUS_NO_OUTAGE,
+        statusCode: STATUS_CODE.STATUS_NO_OUTAGE,
         updatedAt: moment().format(),
       });
 
       console.log("最近沒有停水");
     }
   } catch (error) {
-    await fileWrite({
+    await sendToHA(BASENAME, "停水通知", "statusCode", {
       status: STATUS.STATUS_ERROR,
+      statusCode: STATUS_CODE.STATUS_ERROR,
       updatedAt: moment().format(),
     });
 

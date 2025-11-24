@@ -25,14 +25,6 @@ const STATUS = {
 const BASENAME = path.basename(__filename, ".js");
 
 (async () => {
-  const sendMqtt = async (data) => {
-    try {
-      await sendToHA(BASENAME, "停電通知", "statusCode", data);
-    } catch (error) {
-      console.error("MQTT 發送失敗", error);
-    }
-  };
-
   try {
     const htmlBody = await axios.get(URL);
 
@@ -73,7 +65,7 @@ const BASENAME = path.basename(__filename, ".js");
     });
 
     if (foundDate) {
-      await sendMqtt({
+      await sendToHA(BASENAME, "停電通知", "statusCode", {
         status: STATUS.STATUS_OUTAGE,
         statusCode: STATUS_CODE.STATUS_OUTAGE,
         updatedAt: moment().format(),
@@ -82,7 +74,7 @@ const BASENAME = path.basename(__filename, ".js");
 
       console.log(foundDate.format("YYYY/MM/DD"));
     } else {
-      await sendMqtt({
+      await sendToHA(BASENAME, "停電通知", "statusCode", {
         status: STATUS.STATUS_NO_OUTAGE,
         statusCode: STATUS_CODE.STATUS_NO_OUTAGE,
         updatedAt: moment().format(),
@@ -91,7 +83,7 @@ const BASENAME = path.basename(__filename, ".js");
       console.log("最近沒有停電");
     }
   } catch (error) {
-    await sendMqtt({
+    await sendToHA(BASENAME, "停電通知", "statusCode", {
       status: STATUS.STATUS_ERROR,
       statusCode: STATUS_CODE.STATUS_ERROR,
       updatedAt: moment().format(),

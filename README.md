@@ -29,7 +29,7 @@ scripts:
     env_vars: '{"OUTAGE_KEYWORD":"和豐街","MQTT_HOST":"YOUR_MQTT_HOST","MQTT_USER":"YOUR_MQTT_USER","MQTT_PASS":"YOUR_MQTT_PASS"}'
   - path: app_scripts/water_outage.js
     cron: "0 9 * * *"
-    env_vars: '{"OUTAGE_CITY":"基隆市","OUTAGE_DISTRICT":"中正區","OUTAGE_AREA":"和豐街"}'
+    env_vars: '{"OUTAGE_CITY":"基隆市","OUTAGE_DISTRICT":"中正區","OUTAGE_AREA":"和豐街","MQTT_HOST":"YOUR_MQTT_HOST","MQTT_USER":"YOUR_MQTT_USER","MQTT_PASS":"YOUR_MQTT_PASS"}'
 ```
 
 ### 設定參數說明
@@ -77,16 +77,20 @@ scripts:
 
 ### 2. 停水通知 (`water_outage.js`)
 
-監控台灣自來水公司的停水公告，當指定區域有停水或降壓通知時，寫入資料到檔案。
+監控台灣自來水公司的停水公告，當指定區域有停水或降壓通知時，自動在 Home Assistant 建立 sensor。
 
 **環境變數:**
-- `OUTAGE_CITY`：要監控的縣市 (預設："基隆市")
-- `OUTAGE_DISTRICT`：要監控的行政區 (預設："中正區")
-- `OUTAGE_AREA`：要監控的區域 (預設："和豐街")
+- `OUTAGE_CITY`: 要監控的縣市 (預設: "基隆市")
+- `OUTAGE_DISTRICT`: 要監控的行政區 (預設: "中正區")
+- `OUTAGE_AREA`: 要監控的區域 (預設: "和豐街")
+- `MQTT_HOST`: MQTT broker 位址 (預設: "mqtt://core-mosquitto")
+- `MQTT_USER`: MQTT 使用者名稱
+- `MQTT_PASS`: MQTT 密碼
 
-**輸出位置:**
-- 檔案：`/config/node_scheduler_outputs/water_outage.json`
-- 格式：JSON，包含狀態、原因、日期等資訊
+**輸出到 HA:**
+- Entity: `sensor.node_scheduler_water_outage`
+- 狀態: `1` (無停水) / `2` (有停水) / `3` (錯誤)
+- 屬性: 停水原因、停水日期、案件網址、更新時間等
 
 ## 開發自己的腳本
 
