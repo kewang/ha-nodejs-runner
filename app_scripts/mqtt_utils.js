@@ -31,7 +31,7 @@ const sendToHA = async (deviceId, deviceName, payload, sensors) => {
 
       const discoveryPayload = {
         unique_id: uniqueId,
-        name: `${deviceName} ${sensor.sensorName}`, // 例如：台電監控 日期
+        name: sensor.sensorName, // 日期
         state_topic: stateTopic, // ★ 大家聽同一個頻道
         value_template: `{{ value_json.${sensor.stateName} }}`, // ★ 抓取 JSON 裡不同的欄位
         icon: sensor.icon,
@@ -39,7 +39,7 @@ const sendToHA = async (deviceId, deviceName, payload, sensors) => {
           identifiers: [`nodejs_scheduler_${deviceId}`], // 綁定同一個 Device
           name: deviceName,
           manufacturer: "nodejs scheduler",
-          model: "v1.0",
+          model: "v1.0.0",
         },
       };
 
