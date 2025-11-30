@@ -6,21 +6,12 @@ const MQTT_USER = process.env.MQTT_USER || "";
 const MQTT_PASS = process.env.MQTT_PASS || "";
 
 /**
- * 發送數據到 Home Assistant (MQTT Discovery)
- *
- * @param {string} id - 唯一的 ID (英文)，例如 'power_outage'
- * @param {string} name - 在 HA 顯示的名字，例如 '停電通知'
- * @param {string} stateName - 狀態名稱，例如 'status'
- * @param {object} stateData - 資料物件，例如 { status: 'OK', date: '...' }
- * @param {string} icon - 圖示，例如 'mdi:flash'
+ * @param {string} deviceId - 裝置唯一 ID (如 power_outage)
+ * @param {string} deviceName - 裝置名稱 (如 台電監控)
+ * @param {object} payload - 完整的資料 JSON { status: 1, date: '...', ... }
+ * @param {Array} sensors - 定義要建立哪些 Sensor
  */
-const sendToHA = async (
-  id,
-  name,
-  stateName,
-  stateData,
-  icon = "mdi:information"
-) => {
+const sendToHA = async (deviceId, deviceName, payload, sensors) => {
   let client;
 
   try {
@@ -29,42 +20,45 @@ const sendToHA = async (
       password: MQTT_PASS,
     });
 
-    // 定義 Topic
-    const deviceId = `node_scheduler_${id}`;
-    const configTopic = `homeassistant/sensor/${deviceId}/config`;
-    const stateTopic = `homeassistant/sensor/${deviceId}/state`;
+    const baseTopic = `homeassistant/sensor/nodejs_scheduler/${deviceId}`;
+    const stateTopic = `${baseTopic}/state`;
 
-    // 1. 準備 Discovery 設定
-    // 這裡設定 "value_template" 讀取 json 中的 state 欄位作為主狀態
-    // "json_attributes_topic" 則會把整包 json 變成屬性
-    const discoveryPayload = {
-      unique_id: deviceId,
-      name: name,
-      state_topic: stateTopic,
-      icon: icon,
-      value_template: `{{ value_json.${stateName} }}`,
-      json_attributes_topic: stateTopic,
-      device: {
-        identifiers: [deviceId],
-        name: `${name} Monitor`,
-        manufacturer: "nodejs scheduler",
-        model: "v1.0.0",
-      },
-    };
+    // 1. 迴圈：為每一個定義好的 Sensor 發送一張「身分證」
+    for (const sensor of sensors) {
+      // 每個 Sensor 都要有自己的 unique_id 和 config topic
+      const uniqueId = `node_${deviceId}_${sensor.stateName}`;
+      const configTopic = `${baseTopic}/${sensor.stateName}/config`;
 
-    // 2. 發送 Discovery (Retain=true 讓 HA 重啟後記得這個裝置)
-    await client.publishAsync(configTopic, JSON.stringify(discoveryPayload), {
-      retain: true,
-    });
+      const discoveryPayload = {
+        unique_id: uniqueId,
+        name: `${deviceName} ${sensor.sensorName}`, // 例如：台電監控 日期
+        state_topic: stateTopic, // ★ 大家聽同一個頻道
+        value_template: `{{ value_json.${sensor.stateName} }}`, // ★ 抓取 JSON 裡不同的欄位
+        icon: sensor.icon,
+        device: {
+          identifiers: [`nodejs_scheduler_${deviceId}`], // 綁定同一個 Device
+          name: deviceName,
+          manufacturer: "nodejs scheduler",
+          model: "v1.0",
+        },
+      };
 
-    // 3. 發送狀態
-    await client.publishAsync(stateTopic, JSON.stringify(stateData), {
+      console.log(`[Discovery] Registering ${sensor.stateName}...`);
+
+      await client.publishAsync(configTopic, JSON.stringify(discoveryPayload), {
+        retain: true,
+      });
+    }
+
+    // 2. 發送一次數據，所有 Sensor 會同時更新
+    console.log(`[State] Sending data...`);
+
+    await client.publishAsync(stateTopic, JSON.stringify(payload), {
       retain: true,
     });
   } catch (error) {
-    console.error("[MQTT] Connection Error:", error);
+    console.error("[MQTT] Error:", error);
   } finally {
-    // 4. 結束連線
     if (client && client.connected) {
       await client.endAsync();
     }

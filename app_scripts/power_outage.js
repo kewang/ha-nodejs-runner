@@ -22,6 +22,31 @@ const STATUS = {
   STATUS_ERROR: "發生錯誤",
 };
 
+const DEVICE_NAME = "停電通知";
+
+const SENSORS = [
+  {
+    sensorName: "停電日期",
+    stateName: "date",
+    icon: "mdi:calendar-alert",
+  },
+  {
+    sensorName: "狀態代碼",
+    stateName: "statusCode",
+    icon: "mdi:numeric",
+  },
+  {
+    sensorName: "狀態",
+    stateName: "status",
+    icon: "mdi:information-outline",
+  },
+  {
+    sensorName: "更新時間",
+    stateName: "updatedAt",
+    icon: "mdi:clock-outline",
+  },
+];
+
 const BASENAME = path.basename(__filename, ".js");
 
 (async () => {
@@ -65,29 +90,44 @@ const BASENAME = path.basename(__filename, ".js");
     });
 
     if (foundDate) {
-      await sendToHA(BASENAME, "停電通知", "statusCode", {
-        status: STATUS.STATUS_OUTAGE,
-        statusCode: STATUS_CODE.STATUS_OUTAGE,
-        updatedAt: moment().format(),
-        date: foundDate.format("YYYY/MM/DD"),
-      });
+      await sendToHA(
+        BASENAME,
+        DEVICE_NAME,
+        {
+          status: STATUS.STATUS_OUTAGE,
+          statusCode: STATUS_CODE.STATUS_OUTAGE,
+          updatedAt: moment().format(),
+          date: foundDate.format("YYYY/MM/DD"),
+        },
+        SENSORS
+      );
 
       console.log(foundDate.format("YYYY/MM/DD"));
     } else {
-      await sendToHA(BASENAME, "停電通知", "statusCode", {
-        status: STATUS.STATUS_NO_OUTAGE,
-        statusCode: STATUS_CODE.STATUS_NO_OUTAGE,
-        updatedAt: moment().format(),
-      });
+      await sendToHA(
+        BASENAME,
+        DEVICE_NAME,
+        {
+          status: STATUS.STATUS_NO_OUTAGE,
+          statusCode: STATUS_CODE.STATUS_NO_OUTAGE,
+          updatedAt: moment().format(),
+        },
+        SENSORS
+      );
 
       console.log("最近沒有停電");
     }
   } catch (error) {
-    await sendToHA(BASENAME, "停電通知", "statusCode", {
-      status: STATUS.STATUS_ERROR,
-      statusCode: STATUS_CODE.STATUS_ERROR,
-      updatedAt: moment().format(),
-    });
+    await sendToHA(
+      BASENAME,
+      DEVICE_NAME,
+      {
+        status: STATUS.STATUS_ERROR,
+        statusCode: STATUS_CODE.STATUS_ERROR,
+        updatedAt: moment().format(),
+      },
+      SENSORS
+    );
 
     console.error(error);
     console.error("發生錯誤");
