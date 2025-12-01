@@ -8,9 +8,9 @@ const BASE_PATH = __dirname;
 const SUPERVISOR_TOKEN = process.env.SUPERVISOR_TOKEN;
 const SUPERVISOR_URL = "http://supervisor";
 
-console.log(`SUPERVISOR_TOKEN: ${SUPERVISOR_TOKEN ? "FOUND" : "NOT FOUND"}`);
+console.log(`SUPERVISOR_TOKEN: ${SUPERVISOR_TOKEN}`);
 
-console.log("Starting Node.js Script Scheduler (v1.0.6)...");
+console.log("Starting Node.js Script Scheduler (v1.0.7)...");
 
 const getMqttConfig = async (manualOptions) => {
   // 1. 如果使用者有手動設定，優先使用手動設定
