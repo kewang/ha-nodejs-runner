@@ -26,24 +26,26 @@
 在 Add-on 設定頁面中，按照以下格式設定：
 
 ```yaml
-mqtt_host: "mqtt://core-mosquitto"
-mqtt_user: "your_mqtt_username"
-mqtt_pass: "your_mqtt_password"
+# 如果使用 Home Assistant 的 Mosquitto broker，通常不需要設定 mqtt_* 參數，系統會自動偵測。
+# 若需連線外部 MQTT broker 才需設定。
+# mqtt_host: "mqtt://core-mosquitto"
+# mqtt_user: "your_mqtt_username"
+# mqtt_pass: "your_mqtt_password"
 scripts:
   - path: app_scripts/power_outage.js
     cron: "0 8 * * *"
-    env_vars: '{"OUTAGE_KEYWORD":"和豐街"}'
+    env_vars: '{"OUTAGE_KEYWORD":"新豐街"}'
   - path: app_scripts/water_outage.js
     cron: "0 9 * * *"
-    env_vars: '{"OUTAGE_CITY":"基隆市","OUTAGE_DISTRICT":"中正區","OUTAGE_AREA":"和豐街"}'
+    env_vars: '{"OUTAGE_CITY":"基隆市","OUTAGE_DISTRICT":"中正區","OUTAGE_AREA":"新豐街"}'
 ```
 
 ### 設定參數說明
 
 **全域參數:**
-- `mqtt_host`：MQTT broker 位址 (預設: "mqtt://core-mosquitto")
-- `mqtt_user`：MQTT 使用者名稱
-- `mqtt_pass`：MQTT 密碼
+- `mqtt_host`：(選填) MQTT broker 位址。若未設定，會嘗試從 Supervisor 取得資訊。
+- `mqtt_user`：(選填) MQTT 使用者名稱。若未設定，會嘗試從 Supervisor 取得資訊。
+- `mqtt_pass`：(選填) MQTT 密碼。若未設定，會嘗試從 Supervisor 取得資訊。
 
 **腳本參數:**
 - `path`：腳本檔案路徑 (相對於 `/app` 目錄)
@@ -76,7 +78,7 @@ scripts:
 監控台電網站的停電公告，當指定區域有停電通知時，自動在 Home Assistant 建立 sensor。
 
 **環境變數:**
-- `OUTAGE_KEYWORD`：要監控的街道名稱 (預設："和豐街")
+- `OUTAGE_KEYWORD`：要監控的街道名稱
 
 **輸出到 HA:**
 - Entity：`sensor.node_scheduler_power_outage`
@@ -88,9 +90,9 @@ scripts:
 監控台灣自來水公司的停水公告，當指定區域有停水或降壓通知時，自動在 Home Assistant 建立 sensor。
 
 **環境變數:**
-- `OUTAGE_CITY`：要監控的縣市 (預設: "基隆市")
-- `OUTAGE_DISTRICT`：要監控的行政區 (預設: "中正區")
-- `OUTAGE_AREA`：要監控的區域 (預設: "和豐街")
+- `OUTAGE_CITY`：要監控的縣市
+- `OUTAGE_DISTRICT`：要監控的行政區
+- `OUTAGE_AREA`：要監控的區域
 
 **輸出到 HA:**
 - Entity：`sensor.node_scheduler_water_outage`
