@@ -65,32 +65,32 @@ const BASENAME = path.basename(__filename, ".js");
     const $ = cheerio.load(htmlBody.data);
 
     // 裝置類別：自來水、狀態類別：測量、測量單位：mg/L
-    const 自由有效餘氯 = +$(
+    const freeChlorine = +$(
       "#main_content > div.main_page > div.main_page_content > div.table-responsive > table > tbody > tr:nth-child(1) > td:nth-child(2)"
     ).text();
     // 裝置類別：自來水、狀態類別：測量、測量單位：NTU
-    const 濁度 = +$(
+    const turbidity = +$(
       "#main_content > div.main_page > div.main_page_content > div.table-responsive > table > tbody > tr:nth-child(2) > td:nth-child(2)"
     ).text();
     // 裝置類別：自來水、狀態類別：測量、測量單位：無
-    const pH值 = +$(
+    const phValue = +$(
       "#main_content > div.main_page > div.main_page_content > div.table-responsive > table > tbody > tr:nth-child(6) > td:nth-child(2)"
     ).text();
     // 裝置類別：自來水、狀態類別：測量、測量單位：mg/L
-    const 總硬度 = +$(
+    const totalHardness = +$(
       "#main_content > div.main_page > div.main_page_content > div.table-responsive > table > tbody > tr:nth-child(14) > td:nth-child(2)"
     ).text();
     // 裝置類別：自來水、狀態類別：測量、測量單位：mg/L
-    const 硝酸鹽氮 = +$(
+    const nitrateNitrogen = +$(
       "#main_content > div.main_page > div.main_page_content > div.table-responsive > table > tbody > tr:nth-child(12) > td:nth-child(2)"
     ).text();
-    const 總菌落數 = $(
+    const totalBacteria = $(
       "#main_content > div.main_page > div.main_page_content > div.table-responsive > table > tbody > tr:nth-child(19) > td:nth-child(2)"
     ).text();
-    const 大腸桿菌群 = $(
+    const coliformBacteria = $(
       "#main_content > div.main_page > div.main_page_content > div.table-responsive > table > tbody > tr:nth-child(20) > td:nth-child(2)"
     ).text();
-    const 發布日期 = moment(
+    const publishDate = moment(
       $("#main_content > div.main_page > p")
         .text()
         .replace("發布日期：", "")
@@ -99,14 +99,14 @@ const BASENAME = path.basename(__filename, ".js");
     ).format("YYYY-MM-DD");
 
     const stateObj = {
-      自由有效餘氯,
-      濁度,
-      pH值,
-      總硬度,
-      硝酸鹽氮,
-      總菌落數,
-      大腸桿菌群,
-      發布日期,
+      freeChlorine,
+      turbidity,
+      phValue,
+      totalHardness,
+      nitrateNitrogen,
+      totalBacteria,
+      coliformBacteria,
+      publishDate,
     };
 
     console.log(`[${BASENAME}] Fetched data:`, stateObj);
