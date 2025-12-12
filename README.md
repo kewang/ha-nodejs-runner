@@ -8,7 +8,7 @@
 - ✅ 支援多個腳本同時排程
 - ✅ 可為每個腳本設定獨立的環境變數
 - ✅ 透過 MQTT Discovery 自動整合 Home Assistant
-- ✅ 內建停電、停水通知範例腳本
+- ✅ 內建停電、停水、水質檢測通知範例腳本
 - ✅ 支援 aarch64、amd64、armv7 等多種架構
 
 ## 安裝方式
@@ -38,6 +38,9 @@ scripts:
   - path: app_scripts/water_outage.js
     cron: "0 9 * * *"
     env_vars: '{"OUTAGE_CITY":"基隆市","OUTAGE_DISTRICT":"中正區","OUTAGE_AREA":"新豐街"}'
+  - path: app_scripts/water_quality.js
+    cron: "0 10 * * *"
+    env_vars: '{"STATION_ID":"1"}'
 ```
 
 ### 設定參數說明
@@ -98,6 +101,17 @@ scripts:
 - Entity：`sensor.node_scheduler_water_outage`
 - 狀態：`1` (無停水) / `2` (有停水) / `3` (錯誤)
 - 屬性：停水原因、停水日期、案件網址、更新時間等
+
+### 3. 水質檢測 (`water_quality.js`)
+
+監控台灣自來水公司的淨水場水質檢測資料，定期更新指定淨水場的水質數據。
+
+**環境變數:**
+- `STATION_ID`：淨水場 ID（詳細 ID 列表請參考 `app_scripts/assets/water_quality_station.json`）
+
+**輸出到 HA:**
+- Entity：`sensor.node_water_quality_name`、`sensor.node_water_quality_address`、`sensor.node_water_quality_freeChlorine` 等
+- 屬性：淨水場名稱、地址、自由有效餘氯、濁度、pH值、總硬度、硝酸鹽氮、總菌落數、大腸桿菌群、發布日期
 
 ## 開發自己的腳本
 
@@ -199,7 +213,10 @@ scripts:
     ├── package.json       # 腳本依賴
     ├── mqtt_utils.js      # MQTT 工具函式
     ├── power_outage.js    # 停電通知範例
-    └── water_outage.js    # 停水通知範例
+    ├── water_outage.js    # 停水通知範例
+    ├── water_quality.js   # 水質檢測範例
+    └── assets/            # 參考資料
+        └── water_quality_station.json  # 淨水場 ID 列表
 ```
 
 ## 技術細節

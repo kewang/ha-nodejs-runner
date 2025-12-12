@@ -3,15 +3,24 @@ const moment = require("moment");
 const cheerio = require("cheerio");
 const path = require("path");
 const { sendToHA } = require("./mqtt_utils");
+const STATIONS = require("../stations/water_quality_stations.json");
 
 const URL =
-  "https://www.water.gov.tw/ch/WaterQuality/Detail/{detailId}?nodeId=4631";
-
-const DETAIL_ID = process.env.DETAIL_ID || "1991";
+  "https://www.water.gov.tw/ch/WaterQuality/Detail/{stationId}?nodeId=4631";
 
 const DEVICE_NAME = "水質檢測";
 
 const SENSORS = [
+  {
+    sensorName: "淨水場名稱",
+    stateName: "name",
+    icon: "mdi:water",
+  },
+  {
+    sensorName: "淨水場地址",
+    stateName: "address",
+    icon: "mdi:map-marker-radius",
+  },
   {
     sensorName: "自由有效餘氯",
     stateName: "freeChlorine",
@@ -54,15 +63,29 @@ const SENSORS = [
   },
 ];
 
+const findStation = (stationId) => {
+  const found = STATIONS.find((station) => station.id === stationId);
+
+  if (!found) {
+    return STATIONS[0];
+  }
+
+  return found;
+};
+
 const BASENAME = path.basename(__filename, ".js");
 
 (async () => {
   try {
-    const url = URL.replace("{detailId}", DETAIL_ID);
+    const station = findStation(process.env.STATION_ID);
+
+    const url = URL.replace("{stationId}", station.id);
 
     const htmlBody = await axios.get(url);
 
     const $ = cheerio.load(htmlBody.data);
+
+    const { name, address } = station;
 
     // 裝置類別：自來水、狀態類別：測量、測量單位：mg/L
     const freeChlorine = +$(
@@ -99,6 +122,8 @@ const BASENAME = path.basename(__filename, ".js");
     ).format("YYYY-MM-DD");
 
     const stateObj = {
+      name,
+      address,
       freeChlorine,
       turbidity,
       phValue,
