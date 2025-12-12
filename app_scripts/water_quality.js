@@ -3,7 +3,7 @@ const moment = require("moment");
 const cheerio = require("cheerio");
 const path = require("path");
 const { sendToHA } = require("./mqtt_utils");
-const STATIONS = require("../stations/water_quality_stations.json");
+const STATIONS = require("./assets/water_quality_station.json");
 
 const URL =
   "https://www.water.gov.tw/ch/WaterQuality/Detail/{stationId}?nodeId=4631";
