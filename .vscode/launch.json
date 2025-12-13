@@ -8,8 +8,8 @@
       "type": "node",
       "request": "launch",
       "name": "Launch water_quality",
-      "runtimeExecutable": "/home/kewang/.nvm/versions/node/v20.18.1/bin/node",
-      "program": "${workspaceFolder}/app_scripts/water_quality.js",
+      "runtimeExecutable": "/home/kewang/.nvm/versions/node/v20.19.0/bin/node",
+      "program": "${workspaceFolder}/app_scripts/power_outage.js",
       "console": "integratedTerminal"
     }
   ]
