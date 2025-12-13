@@ -22,22 +22,6 @@ schema:
   mqtt_user: str?
   mqtt_pass: password?
   scripts:
-    - path: match(app_scripts/power_outage.js)
-      cron: str
-      env_vars:
-        POWER_STATION_NAME: str
-        POWER_STATION_AREA: str
-        OUTAGE_KEYWORD: str
-    - path: match(app_scripts/water_outage.js)
-      cron: str
-      env_vars:
-        OUTAGE_CITY: str
-        OUTAGE_DISTRICT: str
-        OUTAGE_AREA: str
-    - path: match(app_scripts/water_quality.js)
-      cron: str
-      env_vars:
-        STATION_ID: str
     - path: str
       cron: str
       env_vars: str?

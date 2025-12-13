@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.17] - 2025-12-13
+
+### Changed
+- 將 config.yaml schema 改回原本的簡單格式，使用 `env_vars: str?` 而非結構化物件
+
+### Fixed
+- 修正 1.0.16 版本中 schema 格式無法在 Home Assistant 中正常運作的問題
+
 ## [1.0.16] - 2025-12-13
 
 ### Changed
@@ -14,6 +22,9 @@ All notable changes to this project will be documented in this file.
 ### Improved
 - 大幅提升設定檔的可讀性，不再需要使用難以閱讀的 JSON 字串格式
 - 在 Home Assistant UI 中設定環境變數時，現在會顯示清楚的欄位結構
+
+### Note
+- 此版本因 schema 格式問題已在 1.0.17 回退
 
 ## [1.0.15] - 2025-12-13
 
