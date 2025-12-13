@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.16] - 2025-12-13
+
+### Changed
+- 改進 config.yaml schema 設定，針對不同的內建腳本使用結構化的環境變數格式
+  - `app_scripts/power_outage.js` 的 `env_vars` 現在使用物件格式，包含 `POWER_STATION_NAME`、`POWER_STATION_AREA`、`OUTAGE_KEYWORD` 欄位
+  - `app_scripts/water_outage.js` 的 `env_vars` 現在使用物件格式，包含 `OUTAGE_CITY`、`OUTAGE_DISTRICT`、`OUTAGE_AREA` 欄位
+  - `app_scripts/water_quality.js` 的 `env_vars` 現在使用物件格式，包含 `STATION_ID` 欄位
+  - 其他自訂腳本仍保留彈性的字串格式
+
+### Improved
+- 大幅提升設定檔的可讀性，不再需要使用難以閱讀的 JSON 字串格式
+- 在 Home Assistant UI 中設定環境變數時，現在會顯示清楚的欄位結構
+
 ## [1.0.15] - 2025-12-13
 
 ### Added
