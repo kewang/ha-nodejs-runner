@@ -48,6 +48,18 @@ const sendToHA = async (deviceId, deviceName, payload, sensors) => {
         discoveryPayload.icon = sensor.icon;
       }
 
+      if (sensor.unitOfMeasurement) {
+        discoveryPayload.unit_of_measurement = sensor.unitOfMeasurement;
+      }
+
+      if (sensor.stateClass) {
+        discoveryPayload.state_class = sensor.stateClass;
+      }
+
+      if (sensor.deviceClass) {
+        discoveryPayload.device_class = sensor.deviceClass;
+      }
+
       console.log(`[Discovery] Registering ${sensor.stateName}...`);
 
       await client.publishAsync(configTopic, JSON.stringify(discoveryPayload), {
